@@ -3,7 +3,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, HttpUrl
+from pydantic import BaseModel, ConfigDict, Field, HttpUrl
 
 
 class PaymentCreate(BaseModel):
@@ -23,13 +23,13 @@ class PaymentCreatedResponse(BaseModel):
 
 
 class PaymentResponse(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
     id: uuid.UUID
     amount: Decimal
     currency: str
     description: str | None
-    metadata: dict[str, Any] | None
+    metadata: dict[str, Any] | None = Field(validation_alias="metadata_")
     status: str
     idempotency_key: str
     webhook_url: str | None
