@@ -9,9 +9,7 @@ from app.uow import AbstractUnitOfWork
 
 class AbstractPaymentService(ABC):
     @abstractmethod
-    async def create(
-        self, data: PaymentCreate, idempotency_key: str
-    ) -> Payment: ...
+    async def create(self, data: PaymentCreate, idempotency_key: str) -> Payment: ...
 
     @abstractmethod
     async def get_by_id(self, payment_id: uuid.UUID) -> Payment | None: ...
@@ -21,9 +19,7 @@ class PaymentService(AbstractPaymentService):
     def __init__(self, uow: AbstractUnitOfWork) -> None:
         self._uow = uow
 
-    async def create(
-        self, data: PaymentCreate, idempotency_key: str
-    ) -> Payment:
+    async def create(self, data: PaymentCreate, idempotency_key: str) -> Payment:
         existing = await self._uow.payments.get_by_idempotency_key(idempotency_key)
         if existing is not None:
             return existing
