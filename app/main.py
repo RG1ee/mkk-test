@@ -2,10 +2,10 @@ from faststream.rabbit.fastapi import RabbitRouter
 from fastapi import FastAPI
 
 from app.api.router import router
-from app.broker import declare_topology
+from app.broker.topology import declare_topology
 from app.config import settings
 
-rabbit_router = RabbitRouter(settings.rabbitmq_url)
+rabbit_router = RabbitRouter(settings.rabbitmq.url)
 
 
 @rabbit_router.after_startup
