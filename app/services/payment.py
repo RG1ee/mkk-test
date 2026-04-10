@@ -1,5 +1,6 @@
 import uuid
 from abc import ABC, abstractmethod
+from datetime import datetime, timezone
 
 from app.models import OutboxEvent, Payment
 from app.schemas import PaymentCreate, PaymentEvent
@@ -34,8 +35,10 @@ class PaymentService(AbstractPaymentService):
             currency=data.currency,
             description=data.description,
             metadata_=data.metadata,
+            status="pending",
             idempotency_key=idempotency_key,
             webhook_url=str(data.webhook_url) if data.webhook_url else None,
+            created_at=datetime.now(timezone.utc),
         )
         await self._uow.payments.add(payment)
 
