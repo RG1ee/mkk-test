@@ -1,3 +1,15 @@
+x-app-env: &app-env
+  APP_POSTGRES__HOST: postgres
+  APP_POSTGRES__PORT: 5432
+  APP_POSTGRES__USER: ${APP_POSTGRES__USER}
+  APP_POSTGRES__PASSWORD: ${APP_POSTGRES__PASSWORD}
+  APP_POSTGRES__DB: ${APP_POSTGRES__DB}
+  APP_RABBITMQ__HOST: rabbitmq
+  APP_RABBITMQ__PORT: 5672
+  APP_RABBITMQ__USER: ${APP_RABBITMQ__USER}
+  APP_RABBITMQ__PASSWORD: ${APP_RABBITMQ__PASSWORD}
+  APP_API_KEY: ${APP_API_KEY}
+
 services:
   postgres:
     image: postgres:16
@@ -30,6 +42,56 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
+
+  migrate:
+    build: .
+    command: ["alembic", "upgrade", "head"]
+    environment:
+      <<: *app-env
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  api:
+    build: .
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    environment:
+      <<: *app-env
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
+  outbox-relay:
+    build: .
+    command: ["python", "-m", "app.workers.outbox_relay"]
+    environment:
+      <<: *app-env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
+  consumer:
+    build: .
+    command: ["python", "-m", "app.workers.consumer"]
+    environment:
+      <<: *app-env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
 
 volumes:
   postgres_data:
