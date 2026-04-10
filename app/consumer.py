@@ -1,7 +1,6 @@
 import asyncio
 import logging
 import random
-import uuid
 
 from faststream import FastStream
 from faststream.rabbit import RabbitBroker
