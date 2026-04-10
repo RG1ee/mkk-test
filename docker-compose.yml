@@ -2,15 +2,15 @@ services:
   postgres:
     image: postgres:16
     environment:
-      POSTGRES_USER: ${APP_POSTGRES_USER}
-      POSTGRES_PASSWORD: ${APP_POSTGRES_PASSWORD}
-      POSTGRES_DB: ${APP_POSTGRES_DB}
+      POSTGRES_USER: ${APP_POSTGRES__USER}
+      POSTGRES_PASSWORD: ${APP_POSTGRES__PASSWORD}
+      POSTGRES_DB: ${APP_POSTGRES__DB}
     ports:
-      - "${APP_POSTGRES_PORT}:5432"
+      - "${APP_POSTGRES__PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${APP_POSTGRES_USER} -d ${APP_POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U ${APP_POSTGRES__USER} -d ${APP_POSTGRES__DB}"]
       interval: 5s
       timeout: 3s
       retries: 5
@@ -18,10 +18,10 @@ services:
   rabbitmq:
     image: rabbitmq:3-management
     environment:
-      RABBITMQ_DEFAULT_USER: ${APP_RABBITMQ_USER}
-      RABBITMQ_DEFAULT_PASS: ${APP_RABBITMQ_PASSWORD}
+      RABBITMQ_DEFAULT_USER: ${APP_RABBITMQ__USER}
+      RABBITMQ_DEFAULT_PASS: ${APP_RABBITMQ__PASSWORD}
     ports:
-      - "${APP_RABBITMQ_PORT}:5672"
+      - "${APP_RABBITMQ__PORT}:5672"
       - "15672:15672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
